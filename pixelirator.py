@@ -2,7 +2,7 @@
 ##################################################################################
 # Author: Huaqin Xu (huaxu@ucdavis.edu)
 # Supervisor: Alexander Kozik (akozik@atgc.org)
-# Date: May. 15. 2007
+# Date: May. 15. 2007 	Latest Update: 10/25/2013
 # Description:
 #
 # This python script print a image from input file and confiure file. 
@@ -15,6 +15,9 @@
 #	4.Option: 0 -- draw image; others -- draw color schema
 # Output: image file
 #
+# example:
+#	python pixelirator.py config.txt colormap.txt input.txt 0
+#
 ######################################################################################
 
 import Image,ImageDraw, ImageFont
@@ -23,12 +26,11 @@ import re
 import array
 import os
 from math import *
-from os.path import exists, join 
+from os.path import exists, join, basename, splitext
 
 
 # Please change the fontpath to the complete path where you install the pilfonts
-# fontpath = "/export/home/www/web/cgpdb/htdocs/data_pixelirator/script/pilfonts/"
-fontpath = "C:\Documents and Settings\hxu\Desktop\pix\pilfonts"
+fontpath = "."
 
 
 # ---------------------------functions ------------------------------------------------
@@ -78,7 +80,7 @@ def getData(lines):
 		print "Empty Data file!"
 		sys.exit(0)
 	else:
-		colcount=lines[0].count(delimiter)+1
+		colcount=lines[rowstart].count(delimiter)+1
 	if(rowstart<0 or colstart <0):
 		print "Invalid data start position!"
 		sys.exit(0)
@@ -107,7 +109,8 @@ def getData(lines):
 				if(ylabelat<0):
 					ylabel.append(str(i))
 				else:
-					ylabel.append(arow[ylabelat])			
+#					ylabel.append(arow[ylabelat])
+					ylabel.append('-'.join(arow[ylabelat:colstart]))
 				table.append(arow[colstart:])
 				i=i+1
 			else:
@@ -145,6 +148,7 @@ def setInt(t):
 
 def getConfig(configlines):
 	global configset
+	global infbase
 
 	configset['cell_size'] = 15, 15
 	configset['cell_space'] = "1"
@@ -155,7 +159,7 @@ def getConfig(configlines):
 	configset['space_size'] = 20, 20
 
 	configset['title_pos'] = "N"
-	configset['title_text'] = "Test Image"
+	configset['title_text'] = infbase
 	configset['bar_pos'] = "N"
 	configset['bar_size'] = 5, 20
 	configset['xlabel_pos'] = "N"
@@ -638,16 +642,18 @@ def drawBar(barx, bary, ftcolor, bgcolor, maptype):
 #----------------------------- main ------------------------------------------------------
 
 # ----- get options and file names and open files -----
-if len(sys.argv) == 6:
+if len(sys.argv) == 5:
 	configfile=sys.argv[1]
 	colorfile=sys.argv[2]
 	datafile=sys.argv[3]
-	outfile=sys.argv[4]
-	choice=sys.argv[5]
+	choice=sys.argv[4]
 else: 
 	print len(sys.argv)
-	print 'Usage: [1]config file, [2] color map, [3] data file, [4] output file, [5] choice'
+	print 'Usage: [1]config file, [2] color map, [3] data file, [4] choice'
 	sys.exit(1) 
+
+infbase = splitext(basename(datafile))[0]
+outfile = infbase + ".png"
 
 configset={}
 configf=open_file(configfile,'r')
