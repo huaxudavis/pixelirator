@@ -20,7 +20,7 @@
 #
 ######################################################################################
 
-import Image,ImageDraw, ImageFont
+from PIL import Image,ImageDraw, ImageFont
 import sys
 import re
 import array
@@ -552,7 +552,7 @@ def label2img(labellist, height, fontname="helvR08.pil", imgformat="PNG",
     	draw.text((0, i*height), labellist[i], fill=fgcolor, font=font)
 
     if rotate_angle:
-        imgOut = imgOut.rotate(rotate_angle)
+        imgOut = imgOut.rotate(rotate_angle, expand=1)
 
     return imgOut
 
